@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { store } from '../store.js';
-import { getNodeCount } from './scale.js';
+import { getNodeCount } from '../state.js';
 
 const router = Router();
 

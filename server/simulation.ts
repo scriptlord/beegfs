@@ -1,6 +1,6 @@
 import { store } from './store.js';
 import { generateSingleEvent, randomBetween } from './generators.js';
-import { getNodeCount, isVirtualMode } from './routes/scale.js';
+import { getNodeCount } from './state.js';
 import type { NodeStatus, ClusterSummary } from '../shared/types.js';
 
 type BroadcastFn = (event: string, data: unknown) => void;

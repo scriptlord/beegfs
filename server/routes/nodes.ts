@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { store } from '../store.js';
-import { getNodeCount, isVirtualMode } from './scale.js';
+import { getNodeCount, isVirtualMode } from '../state.js';
 import type { StorageNode, NodeStatus } from '../../shared/types.js';
 
 const router = Router();
