@@ -1,0 +1,45 @@
+{
+  "name": "beegfs-ui-demo",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev:client": "vite",
+    "dev:server": "tsx watch server/index.ts",
+    "dev": "concurrently -n server,client -c blue,green \"npm run dev:server\" \"npm run dev:client\"",
+    "generate:api": "openapi-typescript ./openapi.yaml -o ./src/services/api-types.d.ts",
+    "test:rest": "node tests/load-test-rest.mjs",
+    "test:ws": "node tests/load-test-websocket.mjs",
+    "test:rest:heavy": "node tests/load-test-rest.mjs 200 30",
+    "test:ws:heavy": "node tests/load-test-websocket.mjs 500 30",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tanstack/react-table": "^8.21.3",
+    "chart.js": "^4.4.8",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "openapi-fetch": "^0.17.0",
+    "react": "^18.3.1",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.3",
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "@tanstack/react-virtual": "^3.13.22",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@types/ws": "^8.18.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.2.1",
+    "openapi-typescript": "^7.13.0",
+    "puppeteer": "^24.39.1",
+    "tsx": "^4.21.0",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.5"
+  }
+}

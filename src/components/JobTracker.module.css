@@ -1,0 +1,145 @@
+.container {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.header {
+  padding: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.createWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.createBtn {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.createBtn:hover { opacity: 0.9; }
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+  z-index: 10;
+  min-width: 180px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.dropdownItem {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  color: var(--color-text);
+  padding: 10px 16px;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdownItem:hover { background: var(--color-surface-hover); }
+
+.empty {
+  padding: 40px;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+.list {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.jobItem {
+  padding: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.jobItem:last-child { border-bottom: none; }
+
+.jobHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.jobName {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.statusBadge {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.progressBar {
+  position: relative;
+  height: 8px;
+  background: var(--color-bg);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.progressText {
+  position: absolute;
+  right: 8px;
+  top: -18px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.error {
+  color: var(--color-offline);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.jobMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.cancelBtn {
+  background: none;
+  border: 1px solid var(--color-offline);
+  color: var(--color-offline);
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: var(--color-offline);
+  color: #fff;
+}

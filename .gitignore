@@ -1,0 +1,15 @@
+node_modules
+dist
+dist-server
+.env
+*.log
+.DS_Store
+.playwright-mcp
+.claude
+*.pdf
+architecture-guide.md
+beegfs-explained.md
+project-summary.md
+prompt.md
+CLAUDE.md
+.vite

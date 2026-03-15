@@ -1,0 +1,404 @@
+openapi: 3.1.0
+info:
+  title: BeeGFS Cluster Management API
+  description: REST API for monitoring and managing a BeeGFS-inspired distributed storage cluster.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3001/api
+    description: Development server
+
+paths:
+  /cluster:
+    get:
+      operationId: getClusterSummary
+      summary: Get cluster overview
+      description: Returns cluster health, node counts, storage usage, throughput history, and disk usage distribution.
+      responses:
+        "200":
+          description: Cluster summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClusterSummary"
+
+  /nodes:
+    get:
+      operationId: getNodes
+      summary: List storage nodes
+      description: Returns a paginated list of storage nodes with optional search, sort, and filter.
+      parameters:
+        - name: search
+          in: query
+          description: Filter nodes by ID or hostname
+          schema:
+            type: string
+        - name: sortBy
+          in: query
+          description: Column to sort by
+          schema:
+            type: string
+            enum: [id, hostname, status, diskUsagePercent, ioThroughputMBps, lastHeartbeat]
+        - name: sortDir
+          in: query
+          description: Sort direction
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: asc
+        - name: page
+          in: query
+          description: Page number (1-based)
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: pageSize
+          in: query
+          description: Number of items per page
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+            default: 25
+      responses:
+        "200":
+          description: Paginated node list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedNodes"
+
+  /events:
+    get:
+      operationId: getEvents
+      summary: List cluster events
+      description: Returns the event log, optionally filtered by severity.
+      parameters:
+        - name: severity
+          in: query
+          description: Filter by severity level
+          schema:
+            type: string
+            enum: [info, warning, error]
+      responses:
+        "200":
+          description: Event list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClusterEvent"
+
+  /config:
+    get:
+      operationId: getConfig
+      summary: Get cluster configuration
+      description: Returns the current cluster configuration.
+      responses:
+        "200":
+          description: Cluster config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClusterConfig"
+    post:
+      operationId: updateConfig
+      summary: Update cluster configuration
+      description: Partially updates the cluster configuration. Only provided fields are changed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClusterConfigUpdate"
+      responses:
+        "200":
+          description: Updated config
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClusterConfig"
+
+  /jobs:
+    get:
+      operationId: getJobs
+      summary: List jobs
+      description: Returns all cluster jobs (queued, running, completed, failed, cancelled).
+      responses:
+        "200":
+          description: Job list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+    post:
+      operationId: createJob
+      summary: Create a new job
+      description: Creates a new cluster job (rebalance, pool expansion, or health check).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [type]
+              properties:
+                type:
+                  $ref: "#/components/schemas/JobType"
+      responses:
+        "201":
+          description: Created job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+
+  /jobs/{id}:
+    delete:
+      operationId: cancelJob
+      summary: Cancel a job
+      description: Cancels a queued or running job.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cancelled job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "400":
+          description: Job cannot be cancelled (already finished)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    NodeStatus:
+      type: string
+      enum: [healthy, degraded, offline]
+
+    StorageNode:
+      type: object
+      required: [id, hostname, status, diskUsagePercent, ioThroughputMBps, lastHeartbeat]
+      properties:
+        id:
+          type: string
+          example: node-0042
+        hostname:
+          type: string
+          example: storage-node-042
+        status:
+          $ref: "#/components/schemas/NodeStatus"
+        diskUsagePercent:
+          type: number
+          minimum: 0
+          maximum: 100
+          example: 67.3
+        ioThroughputMBps:
+          type: number
+          example: 245.8
+        lastHeartbeat:
+          type: string
+          format: date-time
+
+    ThroughputDataPoint:
+      type: object
+      required: [timestamp, readMBps, writeMBps]
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        readMBps:
+          type: number
+        writeMBps:
+          type: number
+
+    DiskUsageBucket:
+      type: object
+      required: [range, count]
+      properties:
+        range:
+          type: string
+          example: "50-75%"
+        count:
+          type: integer
+
+    ClusterSummary:
+      type: object
+      required: [totalNodes, activeNodes, healthyNodes, degradedNodes, offlineNodes, storageUsedTB, storageTotalTB, clusterHealth, throughputHistory, diskUsageDistribution]
+      properties:
+        totalNodes:
+          type: integer
+        activeNodes:
+          type: integer
+        healthyNodes:
+          type: integer
+        degradedNodes:
+          type: integer
+        offlineNodes:
+          type: integer
+        storageUsedTB:
+          type: number
+        storageTotalTB:
+          type: number
+        clusterHealth:
+          type: string
+          enum: [green, yellow, red]
+        throughputHistory:
+          type: array
+          items:
+            $ref: "#/components/schemas/ThroughputDataPoint"
+        diskUsageDistribution:
+          type: array
+          items:
+            $ref: "#/components/schemas/DiskUsageBucket"
+
+    EventSeverity:
+      type: string
+      enum: [info, warning, error]
+
+    EventType:
+      type: string
+      enum: [node_joined, node_failure, disk_capacity_warning, storage_pool_expanded]
+
+    ClusterEvent:
+      type: object
+      required: [id, timestamp, type, severity, message]
+      properties:
+        id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        type:
+          $ref: "#/components/schemas/EventType"
+        severity:
+          $ref: "#/components/schemas/EventSeverity"
+        message:
+          type: string
+        nodeId:
+          type: string
+
+    StorageTarget:
+      type: object
+      required: [id, path, capacityTB, enabled]
+      properties:
+        id:
+          type: string
+        path:
+          type: string
+        capacityTB:
+          type: number
+        enabled:
+          type: boolean
+
+    ClusterConfig:
+      type: object
+      required: [replicationFactor, metadataServers, maintenanceMode, storageTargets]
+      properties:
+        replicationFactor:
+          type: integer
+          minimum: 1
+          maximum: 4
+        metadataServers:
+          type: array
+          items:
+            type: string
+        maintenanceMode:
+          type: boolean
+        storageTargets:
+          type: array
+          items:
+            $ref: "#/components/schemas/StorageTarget"
+
+    ClusterConfigUpdate:
+      type: object
+      properties:
+        replicationFactor:
+          type: integer
+          minimum: 1
+          maximum: 4
+        metadataServers:
+          type: array
+          items:
+            type: string
+        maintenanceMode:
+          type: boolean
+        storageTargets:
+          type: array
+          items:
+            $ref: "#/components/schemas/StorageTarget"
+
+    JobType:
+      type: string
+      enum: [rebalance, pool_expansion, health_check]
+
+    JobStatus:
+      type: string
+      enum: [queued, running, completed, failed, cancelled]
+
+    Job:
+      type: object
+      required: [id, type, name, status, progress, createdAt, updatedAt]
+      properties:
+        id:
+          type: string
+        type:
+          $ref: "#/components/schemas/JobType"
+        name:
+          type: string
+        status:
+          $ref: "#/components/schemas/JobStatus"
+        progress:
+          type: number
+          minimum: 0
+          maximum: 100
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        error:
+          type: string
+
+    PaginatedNodes:
+      type: object
+      required: [data, total, page, pageSize, totalPages]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StorageNode"
+        total:
+          type: integer
+        page:
+          type: integer
+        pageSize:
+          type: integer
+        totalPages:
+          type: integer
+
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
