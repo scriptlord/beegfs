@@ -8,6 +8,15 @@ A full-stack admin dashboard for monitoring and managing a BeeGFS-inspired distr
 ![WebSocket](https://img.shields.io/badge/WebSocket-Real--time-green)
 ![OpenAPI](https://img.shields.io/badge/OpenAPI-3.1-6ba539)
 
+### Live Demo
+
+- **Dashboard:** [beegfs.vercel.app](https://beegfs.vercel.app)
+- **API:** [beegfs.onrender.com/api/cluster](https://beegfs.onrender.com/api/cluster)
+- **API Spec:** [beegfs.onrender.com/api/docs](https://beegfs.onrender.com/api/docs)
+- **Source:** [github.com/scriptlord/beegfs](https://github.com/scriptlord/beegfs)
+
+> Note: The backend runs on Render's free tier and may take 30-60 seconds to cold-start after inactivity. If the dashboard shows "Disconnected," wait a moment and it will auto-reconnect.
+
 ---
 
 ## What Is This?
